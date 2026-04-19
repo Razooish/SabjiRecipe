@@ -492,7 +492,8 @@
         }
 
         .form-group input,
-        .form-group textarea {
+        .form-group textarea,
+        .form-group select {
             width: 100%;
             padding: 0.9rem;
             border: 2px solid var(--border-light);
@@ -503,7 +504,8 @@
         }
 
         .form-group input:focus,
-        .form-group textarea:focus {
+        .form-group textarea:focus,
+        .form-group select:focus {
             outline: none;
             border-color: var(--accent-green);
             box-shadow: 0 0 0 3px rgba(74, 124, 44, 0.1);
@@ -512,6 +514,174 @@
         .form-group textarea {
             resize: vertical;
             min-height: 120px;
+        }
+
+        /* Bid Popup */
+        .bid-modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 24, 12, 0.68);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.25rem;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .bid-modal-backdrop.is-visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .bid-modal {
+            width: min(100%, 560px);
+            background: linear-gradient(180deg, #ffffff 0%, #fffaf3 100%);
+            border-radius: 24px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.28);
+            border: 1px solid rgba(54, 161, 58, 0.14);
+            position: relative;
+            overflow: hidden;
+            transform: translateY(24px) scale(0.98);
+            transition: transform 0.25s ease;
+        }
+
+        .bid-modal-backdrop.is-visible .bid-modal {
+            transform: translateY(0) scale(1);
+        }
+
+        .bid-modal::before {
+            content: '';
+            position: absolute;
+            inset: 0 auto auto 0;
+            width: 100%;
+            height: 8px;
+        }
+
+        .bid-modal-inner {
+            padding: 2rem;
+        }
+
+        .bid-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 2.5rem;
+            height: 2.5rem;
+            border: none;
+            border-radius: 50%;
+            background: rgba(74, 124, 44, 0.08);
+            color: var(--primary-green);
+            font-size: 1.5rem;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .bid-modal-eyebrow {
+            display: inline-block;
+            color: var(--warm-orange);
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 0.85rem;
+        }
+
+        .bid-modal h2 {
+            font-size: 1.9rem;
+            line-height: 1.2;
+            color: var(--primary-green);
+            margin-bottom: 0.75rem;
+        }
+
+        .bid-modal p {
+            color: var(--text-light);
+            margin-bottom: 1.25rem;
+        }
+
+        .bid-price-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            background: var(--light-cream);
+            border-radius: 16px;
+            padding: 1rem 1.1rem;
+            margin-bottom: 1.25rem;
+            border: 1px solid rgba(54, 161, 58, 0.12);
+        }
+
+        .bid-price-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .bid-price-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent-green);
+        }
+
+        .bid-presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .bid-pill {
+            border: 1px solid rgba(54, 161, 58, 0.25);
+            background: #fff;
+            color: var(--text-dark);
+            border-radius: 999px;
+            padding: 0.65rem 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .bid-pill:hover,
+        .bid-pill.is-active {
+            background: var(--accent-green);
+            color: #fff;
+            border-color: var(--accent-green);
+        }
+
+        .bid-field-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .bid-field-row .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .bid-modal-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--primary-green);
+            border: 2px solid rgba(54, 161, 58, 0.28);
+        }
+
+        .bid-modal-note {
+            font-size: 0.88rem;
+            color: var(--text-light);
+            margin-top: 0.9rem;
+            margin-bottom: 0;
+        }
+
+        body.modal-open {
+            overflow: hidden;
         }
 
         /* Footer */
@@ -894,6 +1064,40 @@
         </div>
     </section>
 
+    <!-- Bid Popup -->
+    <div class="bid-modal-backdrop" id="bidModalBackdrop" aria-hidden="true">
+        <div class="bid-modal" role="dialog" aria-modal="true" aria-labelledby="bidModalTitle">
+            <div class="bid-modal-inner">
+                <button type="button" class="bid-modal-close" id="closeBidModal" aria-label="Close bid form">&times;</button>
+                <h2 id="bidModalTitle">Make a Bid</h2>
+
+                <form id="bidForm">
+                    <div class="bid-presets" aria-label="Predefined bid amounts">
+                        <button type="button" class="bid-pill is-active" data-bid="100">$100</button>
+                        <button type="button" class="bid-pill" data-bid="250">$250</button>
+                        <button type="button" class="bid-pill" data-bid="500">$500</button>
+                        <button type="button" class="bid-pill" data-bid="1000">$1,000</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bidAmountInput">Amount (USD)</label>
+                        <input type="number" id="bidAmountInput" name="bidAmountInput" min="100" step="50" value="100" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bidEmail">Gmail</label>
+                        <input type="email" id="bidEmail" name="bidEmail" placeholder="your@gmail.com" required>
+                    </div>
+
+                    <div class="bid-modal-actions">
+                        <button type="submit" class="btn btn-primary" style="flex: 1;">Submit</button>
+                        <button type="button" class="btn btn-ghost" id="declineBidButton" style="flex: 1;">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer>
         <p>&copy; 2024 sabjirecipe.com | Premium Domain For Sale</p>
@@ -1002,6 +1206,98 @@
             input.addEventListener('blur', function() {
                 this.parentElement.style.transform = 'scale(1)';
             });
+        });
+
+        const bidModalBackdrop = document.getElementById('bidModalBackdrop');
+        const closeBidModalButton = document.getElementById('closeBidModal');
+        const declineBidButton = document.getElementById('declineBidButton');
+        const bidAmountInput = document.getElementById('bidAmountInput');
+        const bidForm = document.getElementById('bidForm');
+        const bidPills = document.querySelectorAll('.bid-pill');
+        let bidModalTimer = null;
+
+        function formatUsdAmount(amount) {
+            return '$' + Number(amount).toLocaleString('en-US');
+        }
+
+        function updateBidSelection(amount) {
+            const numericAmount = Number(amount);
+            if (!Number.isNaN(numericAmount)) {
+                bidAmountInput.value = numericAmount;
+            }
+        }
+
+        function setActiveBidPill(value) {
+            bidPills.forEach(pill => {
+                pill.classList.toggle('is-active', pill.dataset.bid === value);
+            });
+        }
+
+        function openBidModal() {
+            bidModalBackdrop.classList.add('is-visible');
+            bidModalBackdrop.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('modal-open');
+        }
+
+        function closeBidModal() {
+            bidModalBackdrop.classList.remove('is-visible');
+            bidModalBackdrop.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('modal-open');
+            if (bidModalTimer) {
+                clearTimeout(bidModalTimer);
+                bidModalTimer = null;
+            }
+        }
+
+        window.addEventListener('load', () => {
+            bidModalTimer = setTimeout(openBidModal, 2000);
+        });
+
+        closeBidModalButton.addEventListener('click', closeBidModal);
+        declineBidButton.addEventListener('click', closeBidModal);
+
+        bidModalBackdrop.addEventListener('click', event => {
+            if (event.target === bidModalBackdrop) {
+                closeBidModal();
+            }
+        });
+
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && bidModalBackdrop.classList.contains('is-visible')) {
+                closeBidModal();
+            }
+        });
+
+        bidPills.forEach(pill => {
+            pill.addEventListener('click', () => {
+                const preset = pill.dataset.bid;
+                setActiveBidPill(preset);
+                updateBidSelection(preset);
+            });
+        });
+
+        bidAmountInput.addEventListener('input', function() {
+            setActiveBidPill('custom');
+        });
+
+        bidForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const bidAmount = Math.max(100, Number(bidAmountInput.value || 100));
+            const bidEmail = document.getElementById('bidEmail').value;
+            const bidSubject = `Bid offer for sabjirecipe.com - ${formatUsdAmount(bidAmount)}`;
+            const bidBody = `Hello,
+
+I would like to submit a bid for sabjirecipe.com.
+
+Bid amount: ${formatUsdAmount(bidAmount)} USD
+Email: ${bidEmail}
+
+Please get back to me with next steps.`;
+
+            const mailtoLink = `mailto:owner@sabjirecipe.com?subject=${encodeURIComponent(bidSubject)}&body=${bidBody}`;
+            window.location.href = mailtoLink;
+            closeBidModal();
         });
     </script>
 </body>
